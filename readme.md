@@ -105,3 +105,96 @@ SELECT * FROM customers WHERE first_name = 'Jake';
 ```sql
     SELECT * FROM students WHERE age >= 18;
 ```
+
+## 04. Explain the GROUP BY clause and its role in aggregation operations
+
+GROUP BY clause মূলত ডাটাগুলোকে গ্রপ করে আমাদেরকে দেখায়। আমরা আমাদের SELECT clause এর মধ্যে বলে দিতে পারি যে কোন কলাম বা কিসের ভিত্তেতে গ্রুপিং টা করা হবে। যেমন :
+
+ধরেন আমাদের একটা students টেবিল আছে যেখানে name , age , country , course নামের কয়েকটা কলাম আছে। এখন যদি আমরা চাই যে আমরা আমাদের student দেরকে তাদের country wise গ্রুপ করে দেখবো তাহলে তাহলে আমরা এই query টা use করবো।
+
+```sql
+    SELECT country FROM students GROUP BY country;
+```
+
+এই query টা আমাদেরকে এই ধরণের রেজাল্ট দিবে।
+
+| country |
+| ------- |
+| USA     |
+| Mexico  |
+| UK      |
+| Japan   |
+
+GROUP BY clause Aggregate function এর সাথে ভালোভাবে কাজ করে। Group by clause আমরা aggregate function এর সাথেই বেশি ব্যবহার করি।
+
+GROUP BY এর সাথে aggregate function যেভাবে কাজ করে ঐ procedure টার একটা নাম আছে সেটা হলে Split, Combine, Apply। এটা যদি আমরা একটা উদাহরণের মাধ্যমে বুঝার চেষ্টা করি :
+
+xy Table:
+
+| x   | y   |
+| --- | --- |
+| a   | 20  |
+| a   | 15  |
+| b   | 30  |
+| b   | 20  |
+
+এখন আমার যদি এই টেবিলে sum function এর মাধ্যমে দেখতে চাই যে a এবং b এর সমষ্টি কত ? তাহলে আমার এই query টা run করতে পারি।
+
+```sql
+SELECT x, SUM(y) FROM xy GROUP BY x; --output a -> 35 b-> 50
+```
+
+এখন এই query টা টেবিল টাকে দুই ভাগে ভাগ করবে তারপর প্রত্যেকটা ভাগে sum function আলাদা আলাদা ভাবে Run করা হবে তারপর সেগুলো combine করে রেজাল্টটা দেখাবে ।
+
+<table> 
+<tr> 
+<td>
+a
+</td>
+<td>20 </td>
+</tr>
+<tr> 
+<td>
+a
+</td>
+<td>15 </td>
+</tr>
+</table>
+
+<table> 
+<tr> 
+<td>
+b
+</td>
+<td>30 </td>
+</tr>
+<tr> 
+<td>
+b
+</td>
+<td>10 </td>
+</tr>
+</table>
+
+এখন যদি আমরা আমাদের আগের example এ ফেরত যাই এবং এই বার আমরা চাই যে কোন দেশে আমাদের কত জন student আছে ঐটা দেখতে তাহলে আমরা count নামের aggregate function টা ব্যবহার করতে পারি ।
+
+```sql
+SELECT country, COUNT(*) FROM students GROUP BY country;
+```
+
+এখানেও প্রথমে সবাইকে তাদের country অনুযায়ী split করে তারপর Count function টা ঐ split করা টেবিলেরগুলোর উপর Run হবে তারপর সবগুলো টেবিল combine করে রেজাল্ট দেখানো হবে ।
+
+## 05. What is the difference between the VARCHAR and CHAR data types?
+
+CHAR বা character datatype হচ্ছে একটা fixed-length datatype আপনি যদি একটা কলাম কে ২০ char specify করে বলে দেন তাহলে যেটা হবে যে আপনি যদি ঐ কলাম এ ডাটা রাখার সময় আপনার ডাটার length যতটুকুই হোক না কেন সে ২০ ক্যারেক্টার স্পেস পুরো দখল করে নিবে। ধরেন আপনি ২০ ক্যারেক্টার এর জায়গায় ব্যবহার করছেন ৬ ক্যারেক্টার তাহলে সে বাকি ১৪ ক্যারেক্টার empty space দিয়ে ভরাট করে দিবে। অন্যদিকে ,
+
+VARCHAR হচ্ছে একটি variable datatype যেখানে আপনি একটা নির্দিষ্ট length বলে দিবেন এর মধ্যে যদি ডাটা insert করার পর কোনো empty space থাকে না। তার যতটুকু space প্রয়োজন সে ততটুকুই নেয়। আপনি যদি কোনো কলাম কে VARCHAR(২০) বলে দেন তাহলে এর মানে হলে কলাম এর ক্যারেক্টার এর length ১ থেকে ২০ এর মধ্যে যেকোনো ক্যারেক্টার এর হতে পারে।
+
+এখানে উল্লেখ্য যে CHAR এবং VARCHAR দুইটাই প্রত্যেক character ডাটা store করার জন্য ১ byte পরিমান স্পেস দখল করে তবে VARCHAR length এর information store করার জন্য আরো এক্সট্রা কিছু স্পেস দখল করে।
+
+```sql
+    CREATE TABLE persons (first_name CHAR(10),  last_name VARCHAR(20));
+    --এখানে Jon ৩ character এর হওয়া সত্ত্বেও first_name পুরো 10 character নিবে
+    --তবে last_name 20 character হওয়া সত্ত্বেও নিবে শুধুমাত্র 7 character
+    INSERT INTO persons ('Jon', 'Stewart');
+```

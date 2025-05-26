@@ -1,10 +1,5 @@
 -- Active: 1748109511760@@127.0.0.1@5432@conservation_db
 
-
--- create a database named conservation_db
-CREATE DATABASE conservation_db;
-
-
 --creating the ranger table
 CREATE TABLE rangers(ranger_id BIGSERIAL PRIMARY KEY NOT NULL, "name" VARCHAR(50) NOT NULL, region VARCHAR(100) NOT NULL);
 
